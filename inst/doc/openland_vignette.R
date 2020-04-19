@@ -63,7 +63,7 @@ names(testSL)
 testSL
 
 
-## ----fig.height=4, fig.width=7, warning=FALSE---------------------------------
+## ----fig.width=7, fig.height=4------------------------------------------------
 
 plot(testSL$interval_lvl,
      labels = c(leftlabel = "Interval Change Area (%)",
@@ -72,7 +72,7 @@ plot(testSL$interval_lvl,
      leg_curv = c(x = 2/10, y = 3/10))
 
 
-## ---- fig.width=7, fig.height=4, warning=FALSE--------------------------------
+## ----fig.width=7, fig.height=4------------------------------------------------
 
 plot(testSL$category_lvlGain,
      labels = c(leftlabel = bquote("Gain Area (" ~ km^2 ~ ")"),
@@ -82,7 +82,7 @@ plot(testSL$category_lvlGain,
 
 
 
-## ---- fig.width=7, fig.height=4, warning=FALSE--------------------------------
+## ----fig.width=7, fig.height=4------------------------------------------------
 
 plot(testSL$category_lvlLoss,
      labels = c(leftlabel = bquote("Loss Area (" ~ km^2 ~ ")"),
@@ -91,7 +91,7 @@ plot(testSL$category_lvlLoss,
      leg_curv = c(x = 5/10, y = 5/10))
 
 
-## ---- fig.width=7, fig.height=4, warning=FALSE--------------------------------
+## ----fig.width=7, fig.height=4------------------------------------------------
 
 plot(testSL$transition_lvlGain_n,
      labels = c(leftlabel = bquote("Gain of Ap (" ~ km^2 ~ ")"),
@@ -100,7 +100,7 @@ plot(testSL$transition_lvlGain_n,
      leg_curv = c(x = 5/10, y = 5/10))
 
 
-## ---- fig.width=7, fig.height=4, warning=FALSE--------------------------------
+## ----fig.width=7, fig.height=4------------------------------------------------
 
 plot(testSL$transition_lvlLoss_m,
      labels = c(leftlabel = bquote("Loss of SG (" ~ km^2 ~ ")"),
@@ -127,20 +127,20 @@ chordDiagramLand(dataset = SL_2002_2014$lulc_Onestep,
                  legendtable = SL_2002_2014$tb_legend)
 
 
-## ---- fig.width=8, fig.height=4-----------------------------------------------
+## ----fig.width=8, fig.height=4------------------------------------------------
 
 sankeyLand(dataset = SL_2002_2014$lulc_Multistep,
            legendtable = SL_2002_2014$tb_legend)
 
 
 
-## ---- fig.width=8, fig.height=4-----------------------------------------------
+## ----fig.width=8, fig.height=4------------------------------------------------
 
 sankeyLand(dataset = SL_2002_2014$lulc_Onestep,
            legendtable = SL_2002_2014$tb_legend)
 
 
-## ---- fig.width=7, fig.height=4-----------------------------------------------
+## ----fig.width=7, fig.height=4------------------------------------------------
 
 barplotLand(dataset = SL_2002_2014$lulc_Multistep, 
           legendtable = SL_2002_2014$tb_legend,
@@ -214,7 +214,7 @@ barplotLand(dataset = SL_2002_2014$lulc_Multistep,
 
 
 
-## ----mymap, echo=FALSE, fig.cap='Accumulate changes in pixel in the interval 2002 - 2014 in four time points (2002, 2008, 2010, 2012, 2014)', out.width='100%'----
+## ----mymap, echo=FALSE, fig.cap='Accumulated changes in pixels in the interval 2002 - 2014 at four time points (2002, 2008, 2010, 2012, 2014)', out.width='100%'----
 
 knitr::include_graphics("acc_mymap.png")
 

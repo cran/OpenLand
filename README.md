@@ -13,6 +13,8 @@ status](https://ci.appveyor.com/api/projects/status/github/reginalexavier/OpenLa
 coverage](https://codecov.io/gh/reginalexavier/OpenLand/branch/master/graph/badge.svg)](https://codecov.io/gh/reginalexavier/OpenLand?branch=master)
 [![License: GPL
 v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/OpenLand)](https://CRAN.R-project.org/package=OpenLand)
 <!-- badges: end -->
 
 OpenLand is an open-source R package for the analysis of land use and
@@ -26,7 +28,13 @@ standardized multilevel output graphics.
 
 ## Installation
 
-You can install OpenLand from github with:
+Install the released version of OpenLand from CRAN:
+
+``` r
+install.packages("OpenLand")
+```
+
+Or install the development version from GitHub with:
 
 ``` r
 # install.packages("devtools")
@@ -277,11 +285,11 @@ the outcomes of the `acc_changes()` function.
 
 <div class="figure" style="text-align: center">
 
-<img src="man/figures/acc_mymap.png" alt="Accumulate changes in pixel in the interval 2002 - 2014 in four time points (2002, 2008, 2010, 2012, 2014)" width="90%" />
+<img src="man/figures/acc_mymap.png" alt="Accumulated changes in pixels in the interval 2002 - 2014 at four time points (2002, 2008, 2010, 2012, 2014)" width="90%" />
 
 <p class="caption">
 
-Accumulate changes in pixel in the interval 2002 - 2014 in four time
+Accumulated changes in pixels in the interval 2002 - 2014 at four time
 points (2002, 2008, 2010, 2012, 2014)
 
 </p>
