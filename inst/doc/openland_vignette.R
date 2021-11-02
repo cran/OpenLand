@@ -4,17 +4,25 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
+## ----include=FALSE------------------------------------------------------------
+dataset_available <- tryCatch({
+  # downloading the SaoLourencoBasin multi-layer raster and make it available into R
+  url <- "https://zenodo.org/record/3685230/files/SaoLourencoBasin.rda?download=1"
+  temp <- tempfile()
+  download.file(url, temp, mode = "wb") # downloading the SaoLourencoBasin dataset
+  load(temp)
+}, error = function(e) {
+  return(FALSE)
+})
+
+## ----include=FALSE, eval=isFALSE(dataset_available)---------------------------
+#  knitr::knit_exit("## The complete rendering of this document depends on the availability of the dataset in zenodo. Please try at another time.")
+
 ## -----------------------------------------------------------------------------
 # first we load the OpenLand package
 library(OpenLand)
 
-# downloading the SaoLourencoBasin multi-layer raster and make it available into R
-url <- "https://zenodo.org/record/3685230/files/SaoLourencoBasin.rda?download=1"
-
-temp <- tempfile()
-download.file(url, temp, mode = "wb") # downloading the SaoLourencoBasin dataset
-load(temp)
-
+# The SaoLourencoBasin dataset
 SaoLourencoBasin
 
 
