@@ -31,7 +31,7 @@ SaoLourencoBasin
 
 ## -----------------------------------------------------------------------------
 
-# SL_2002_2014 <- contingenceTable(input_raster = SaoLourencoBasin, pixelresolution = 30)
+# SL_2002_2014 <- contingencyTable(input_raster = SaoLourencoBasin, pixelresolution = 30)
 
 SL_2002_2014
 

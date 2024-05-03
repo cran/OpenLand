@@ -1,6 +1,6 @@
 Package: OpenLand
 Title: Quantitative Analysis and Visualization of LUCC
-Version: 1.0.2
+Version: 1.0.3
 Authors@R: c(
     person(given = "Reginal",
            family = "Exavier",
@@ -20,11 +20,12 @@ Description: Tools for the analysis of land use and cover (LUC) time series. It
     implemented, including tools for the generation of standardized multilevel 
     output graphics.
 License: GPL-3
-URL: https://github.com/reginalexavier/OpenLand
+URL: https://reginalexavier.github.io/OpenLand/,
+        https://github.com/reginalexavier/OpenLand
 BugReports: https://github.com/reginalexavier/OpenLand/issues
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.2
+RoxygenNote: 7.3.1
 Depends: R (>= 3.4.0)
 Imports: dplyr (>= 0.8.3), tidyr (>= 1.0.0), ggplot2 (>= 3.2.1),
         gridExtra (>= 2.3), grid, circlize (>= 0.4.8), networkD3 (>=
@@ -36,9 +37,9 @@ Collate: 'OpenLand-package.R' 'rasters_input.R' 'demolandscape.R'
 Suggests: tmap, knitr, rmarkdown, covr, testthat
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2021-11-02 06:54:00 UTC; tredgi
+Packaged: 2024-05-03 13:06:15 UTC; tredgi
 Author: Reginal Exavier [aut, cre] (<https://orcid.org/0000-0002-5237-523X>),
   Peter Zeilhofer [aut]
 Maintainer: Reginal Exavier <reginalexavier@rocketmail.com>
 Repository: CRAN
-Date/Publication: 2021-11-02 07:20:02 UTC
+Date/Publication: 2024-05-03 13:40:02 UTC
