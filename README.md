@@ -45,17 +45,16 @@ detailed illustration, please see our
 
 The OpenLand functionality is illustrated for a LUC dataset of São
 Lourenço river basin, a major Pantanal wetland contribution area as
-provided by the 4<sup>th</sup> edition of the [Monitoring of Changes in
+provided by the 4<sup>th</sup> edition of the Monitoring of Changes in
 Land cover and Land Use in the Upper Paraguay River Basin - Brazilian
-portion - Review Period: 2012 to
-2014](https://www.embrapa.br/pantanal/bacia-do-alto-paraguai) (Embrapa
-Pantanal, Instituto SOS Pantanal, and WWF-Brasil 2015). The time series
-is composed by five LUC maps (2002, 2008, 2010, 2012 and 2014). The
-study area of approximately 22,400 km<sup>2</sup> is located in the
-Cerrado Savannah biom in the southeast of the Brazilian state of Mato
-Grosso. For processing in the OpenLand package, the original multi-year
-shape file was transformed into rasters and then saved as a 5-layer
-`RasterStack` (`SaoLourencoBasin`), available from a public repository
+portion - Review Period: 2012 to 2014 (Embrapa Pantanal, Instituto SOS
+Pantanal, and WWF-Brasil 2015). The time series is composed by five LUC
+maps (2002, 2008, 2010, 2012 and 2014). The study area of approximately
+22,400 km<sup>2</sup> is located in the Cerrado Savannah biom in the
+southeast of the Brazilian state of Mato Grosso. For processing in the
+OpenLand package, the original multi-year shape file was transformed
+into rasters and then saved as a 5-layer `RasterStack`
+(`SaoLourencoBasin`), available from a public repository
 [(10.5281/zenodo.3685229)](https://doi.org/10.5281/zenodo.3685230) as an
 `.RDA` file which can be loaded into `R`.
 
@@ -95,8 +94,10 @@ category which experienced relevant gains and `m` a category with
 important losses.
 
 ``` r
-my_test <- intensityAnalysis(dataset = SL_2002_2014, # here the outcome from the `contingenceTable()` function
-                            category_n = "Ap", category_m = "SG")
+my_test <- intensityAnalysis(
+  dataset = SL_2002_2014, # here the outcome from the `contingenceTable()` function
+  category_n = "Ap", category_m = "SG"
+)
 
 # it returns a list with 6 objects
 names(my_test)
@@ -121,7 +122,6 @@ contains a table of the **category level** result *(gain
 contains a table storing the results of a stationarity test.
 
 ``` r
-
 my_test$category_lvlGain
 #> An object of class "Category"
 #> Slot "lookupcolor":
@@ -174,13 +174,15 @@ arguments, please see the documentation of the
 method.
 
 ``` r
-
 plot(my_test$category_lvlGain,
-     labels = c(leftlabel = bquote("Gain Area (" ~km^2~ ")"),
-                rightlabel = "Intensity Gain (%)"),
-     marginplot = c(.3, .3), labs = c("Categories", "Uniform intensity"), 
-     leg_curv = c(x = 1, y = .5),
-     fontsize_ui = 8)
+  labels = c(
+    leftlabel = bquote("Gain Area (" ~ km^2 ~ ")"),
+    rightlabel = "Intensity Gain (%)"
+  ),
+  marginplot = c(.3, .3), labs = c("Categories", "Uniform intensity"),
+  leg_curv = c(x = 1, y = .5),
+  fontsize_ui = 8
+)
 ```
 
 <div class="figure" style="text-align: center">
@@ -207,14 +209,14 @@ be visualized by a grouped bar chart.
 ##### Net and Gross gain and loss
 
 ``` r
-
-netgrossplot(dataset = SL_2002_2014$lulc_Multistep,
-             legendtable = SL_2002_2014$tb_legend,
-             xlab = "LUC Category",
-             ylab = bquote("Area (" ~ km^2 ~ ")"),
-             changesLabel = c(GC = "Gross changes", NG = "Net Gain", NL = "Net Loss"),
-             color = c(GC = "gray70", NG = "#006400", NL = "#EE2C2C")
-             )
+netgrossplot(
+  dataset = SL_2002_2014$lulc_Multistep,
+  legendtable = SL_2002_2014$tb_legend,
+  xlab = "LUC Category",
+  ylab = bquote("Area (" ~ km^2 ~ ")"),
+  changesLabel = c(GC = "Gross changes", NG = "Net Gain", NL = "Net Loss"),
+  color = c(GC = "gray70", NG = "#006400", NL = "#EE2C2C")
+)
 ```
 
 <div class="figure" style="text-align: center">
@@ -229,9 +231,10 @@ Net Gross Changes 2002 - 2014
 ##### Chord Diagram (2002 - 2014)
 
 ``` r
-
-chordDiagramLand(dataset = SL_2002_2014$lulc_Onestep,
-                 legendtable = SL_2002_2014$tb_legend)
+chordDiagramLand(
+  dataset = SL_2002_2014$lulc_Onestep,
+  legendtable = SL_2002_2014$tb_legend
+)
 ```
 
 <div class="figure" style="text-align: center">
@@ -246,12 +249,11 @@ Chord Diagram 2002 - 2014 (area in km<sup>2</sup>)
 ##### Sankey Multi Step (2002, 2008, 2010, 2012, 2014)
 
 ``` r
-
 # sankeyLand(dataset = SL_2002_2014$lulc_Multistep,
 #            legendtable = SL_2002_2014$tb_legend)
 ```
 
-<img src="man/figures/sankey_multi.png" width="80%" style="display: block; margin: auto;" />
+<img src="man/figures/sankey_multi.png" alt="" width="80%" style="display: block; margin: auto;" />
 
 #### Other functions
 
@@ -295,7 +297,6 @@ Computing. New York, NY: Springer New York.
 
 Embrapa Pantanal, Instituto SOS Pantanal, and WWF-Brasil. 2015.
 “Mapeamento da Bacia do Alto Paraguai.”
-<https://www.embrapa.br/pantanal/bacia-do-alto-paraguai>.
 
 Gu, Zuguang, Lei Gu, Roland Eils, Matthias Schlesner, and Benedikt
 Brors. 2014. “circlize implements and enhances circular visualization in
@@ -308,4 +309,4 @@ R.” Bioinformatics 30 (19): 2811–2.
 Reginal Exavier and Peter Zeilhofer. OpenLand: Software for Quantitative
 Analysis and Visualization of Land Use and Cover Change. The R Journal,
 v. 12, n. 2, p. 359–371, 2021.
-[https://doi.org/10.32614/RJ-2021-021](https://journal.r-project.org/archive/2020/RJ-2021-021/index.html).
+[https://doi.org/10.32614/RJ-2021-021](https://journal.r-project.org/articles/RJ-2021-021/index.html).

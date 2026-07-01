@@ -1,3 +1,108 @@
+#' Download and load a remote .rda dataset (graceful)
+#'
+#' Internal helper to download a remote `.rda` file (e.g., from Zenodo), load it
+#' into an environment, and return a single `TRUE/FALSE` indicating whether the
+#' dataset is available.
+#'
+#' The function is defensive by design: it should not error if the remote host is
+#' unavailable, if the download fails, or if the `.rda` cannot be loaded. It can
+#' optionally cache the downloaded file in a persistent user cache directory.
+#'
+#' @param url character. Remote `.rda` URL.
+#' @param object character or NULL. If provided, requires that this object name
+#'   exists inside the `.rda` file; otherwise returns `FALSE`.
+#' @param envir environment. Environment where the objects from the `.rda` file
+#'   will be loaded.
+#' @param timeout integer. Download timeout (seconds) set via `options(timeout)`.
+#' @param cache logical. Whether to cache the downloaded file.
+#' @param cache_dir character or NULL. Cache directory. When `NULL`, uses
+#'   `tools::R_user_dir("OpenLand", which = "cache")` when available.
+#' @param quiet logical. Passed to `utils::download.file()`.
+#'
+#' @return logical. `TRUE` if the `.rda` was successfully downloaded (or found
+#'   in cache) and loaded into `envir`; `FALSE` otherwise.
+#'
+#' @keywords internal
+.openland_try_download_and_load_rda <- function(url, # nolint: object_length_linter
+                                                object = NULL,
+                                                envir = parent.frame(),
+                                                timeout = 10,
+                                                cache = TRUE,
+                                                cache_dir = NULL,
+                                                quiet = TRUE) {
+  if (!is.character(url) || length(url) != 1L || is.na(url) || !nzchar(url)) {
+    return(FALSE)
+  }
+
+  timeout <- suppressWarnings(as.integer(timeout))
+  if (is.na(timeout) || timeout < 1L) timeout <- 1L
+
+  if (is.null(cache_dir)) {
+    cache_dir <- if (exists("R_user_dir", envir = asNamespace("tools"), inherits = FALSE)) {
+      tools::R_user_dir("OpenLand", which = "cache")
+    } else {
+      file.path(tempdir(), "OpenLand-cache")
+    }
+  }
+
+  if (!is.character(cache_dir) || length(cache_dir) != 1L || is.na(cache_dir) || !nzchar(cache_dir)) {
+    cache_dir <- tempdir()
+  }
+
+  base_name <- basename(sub("\\?.*$", "", url))
+  if (!nzchar(base_name)) base_name <- "OpenLand_zenodo_dataset.rda"
+  if (!grepl("\\.[Rr][Dd][Aa]$", base_name)) base_name <- paste0(base_name, ".rda")
+
+  dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+
+  cached_path <- file.path(cache_dir, base_name)
+  tmp_path <- tempfile(pattern = "OpenLand-", fileext = ".rda")
+  on.exit(unlink(tmp_path, force = TRUE), add = TRUE)
+
+  old_timeout <- getOption("timeout")
+  on.exit(options(timeout = old_timeout), add = TRUE)
+  options(timeout = timeout)
+
+  try_load_into <- function(path) {
+    tmp_env <- new.env(parent = emptyenv())
+    nm <- load(path, envir = tmp_env)
+    if (!is.null(object) && !(object %in% nm)) {
+      return(FALSE)
+    }
+    list2env(as.list(tmp_env, all.names = TRUE), envir = envir)
+    TRUE
+  }
+
+  ok <- tryCatch(
+    {
+      if (isTRUE(cache) && file.exists(cached_path) && isTRUE(file.info(cached_path)$size > 0)) {
+        if (isTRUE(try_load_into(cached_path))) {
+          return(TRUE)
+        }
+        unlink(cached_path, force = TRUE)
+      }
+
+      status <- suppressWarnings(utils::download.file(url, destfile = tmp_path, mode = "wb", quiet = quiet))
+      if (!identical(status, 0L)) {
+        return(FALSE)
+      }
+
+      if (isTRUE(cache)) {
+        ok_copy <- file.copy(tmp_path, cached_path, overwrite = TRUE)
+        if (isTRUE(ok_copy)) {
+          return(isTRUE(try_load_into(cached_path)))
+        }
+      }
+
+      isTRUE(try_load_into(tmp_path))
+    },
+    error = function(e) {
+      FALSE
+    }
+  )
+
+  isTRUE(ok)
+}
 
 #' Summary of multiple parameters in a raster directory
 #'
@@ -14,25 +119,22 @@
 #' @examples
 #' \donttest{
 #' url <- "https://zenodo.org/record/3685230/files/SaoLourencoBasin.rda?download=1"
-#' temp <- tempfile()
-#' download.file(url, temp, mode = "wb") # downloading the SaoLourencoBasin dataset
-#' load(temp)
-#' # the acc_changes() function, with the SaoLourencoBasin dataset
-#'
-#' summary_dir(raster::unstack(SaoLourencoBasin))
+#' if (OpenLand:::.openland_try_download_and_load_rda(url,
+#'   object = "SaoLourencoBasin", timeout = 10
+#' )) {
+#'   summary_dir(raster::unstack(SaoLourencoBasin))
+#' }
 #' }
 #'
 summary_dir <- function(path) {
-
-  if (inherits(path, "list") &
-      inherits(path[[1]], "RasterLayer")) {
+  if (inherits(path, "list") && inherits(path[[1]], "RasterLayer")) {
     layer_list <- path
   } else if (inherits(path, "character")) {
-
     raster_files <-
       list.files(path,
-                 pattern = ".tif$",
-                 full.names = TRUE)
+        pattern = ".tif$",
+        full.names = TRUE
+      )
 
     layer_list <- vector("list", length = length(raster_files))
 
@@ -42,24 +144,26 @@ summary_dir <- function(path) {
     }
   }
 
-  Reduce(rbind,
-         lapply(layer_list, function(x) {
-           layermap <- x
-           tibble(
-             file_name = base::names(x),
-             xmin = raster::xmin(layermap),
-             xmax = raster::xmax(layermap),
-             ymin = raster::ymin(layermap),
-             ymax = raster::ymax(layermap),
-             res_x = raster::res(layermap)[1],
-             res_y = raster::res(layermap)[2],
-             nrow = raster::nrow(layermap),
-             ncol = raster::ncol(layermap),
-             min_val = raster::minValue(layermap),
-             max_val = raster::maxValue(layermap),
-             crs = as.character(raster::crs(layermap))
-           )
-         }))
+  Reduce(
+    rbind,
+    lapply(layer_list, function(x) {
+      layermap <- x
+      tibble(
+        file_name = base::names(x),
+        xmin = raster::xmin(layermap),
+        xmax = raster::xmax(layermap),
+        ymin = raster::ymin(layermap),
+        ymax = raster::ymax(layermap),
+        res_x = raster::res(layermap)[1],
+        res_y = raster::res(layermap)[2],
+        nrow = raster::nrow(layermap),
+        ncol = raster::ncol(layermap),
+        min_val = raster::minValue(layermap),
+        max_val = raster::maxValue(layermap),
+        crs = as.character(raster::crs(layermap))
+      )
+    })
+  )
 }
 
 
@@ -79,10 +183,11 @@ summary_dir <- function(path) {
 #' @examples
 #' \donttest{
 #' url <- "https://zenodo.org/record/3685230/files/SaoLourencoBasin.rda?download=1"
-#' temp <- tempfile()
-#' download.file(url, temp, mode = "wb") # downloading the SaoLourencoBasin dataset
-#' load(temp)
-#' summary_map(SaoLourencoBasin[[1]])
+#' if (OpenLand:::.openland_try_download_and_load_rda(url,
+#'   object = "SaoLourencoBasin", timeout = 10
+#' )) {
+#'   summary_map(SaoLourencoBasin[[1]])
+#' }
 #' }
 #'
 summary_map <- function(path) {
@@ -98,16 +203,17 @@ summary_map <- function(path) {
     }
   value_map <- table(raster::values(rastermap))
 
-  tbfinal <- dplyr::tibble(pixvalue = numeric(length(value_map)),
-                           Qt = numeric(length(value_map)))
+  tbfinal <- dplyr::tibble(
+    pixvalue = numeric(length(value_map)),
+    Qt = numeric(length(value_map))
+  )
 
   for (i in seq_along(value_map)) {
     tbfinal[i, c(1:2)] <-
       list(as.numeric(names(value_map)[i]), value_map[[i]])
   }
-  return(tbfinal)
+  tbfinal
 }
-
 
 
 #' Accumulates changes in a LULC raster time series
@@ -130,16 +236,14 @@ summary_map <- function(path) {
 #' @examples
 #' \donttest{
 #' url <- "https://zenodo.org/record/3685230/files/SaoLourencoBasin.rda?download=1"
-#' temp <- tempfile()
-#' download.file(url, temp, mode = "wb") # downloading the SaoLourencoBasin dataset
-#' load(temp)
-#' # the acc_changes() function, with the SaoLourencoBasin dataset
-#' acc_changes(SaoLourencoBasin)
+#' if (OpenLand:::.openland_try_download_and_load_rda(url,
+#'   object = "SaoLourencoBasin", timeout = 10
+#' )) {
+#'   acc_changes(SaoLourencoBasin)
+#' }
 #' }
 #'
-
 acc_changes <- function(path) {
-
   rList <- .input_rasters(path)
 
   rList <- raster::unstack(rList)
@@ -147,17 +251,19 @@ acc_changes <- function(path) {
   n_raster <- length(rList)
 
   if (n_raster < 2) {
-    stop('acc_changes needs at least 2 rasters')
+    stop("acc_changes needs at least 2 rasters")
   }
 
   difflist <- mapply(
-    function(x, y)
+    function(x, y) {
       raster::overlay(
         x,
         y,
-        fun = function(x1, x2)
+        fun = function(x1, x2) {
           ifelse((x1 != x2), 1, 0)
-      ),
+        }
+      )
+    },
     x = rList[1:(length(rList) - 1)],
     y = rList[2:length(rList)],
     SIMPLIFY = FALSE
@@ -170,14 +276,14 @@ acc_changes <- function(path) {
   df01_values <- table(matrix(sumraster))
 
   df_values <- dplyr::mutate(data.frame(df01_values),
-                             Var1 = as.character(Var1),
-                             Var1 = as.integer(Var1),
-                             Percent = Freq/sum(Freq)*100)
+    Var1 = as.character(Var1),
+    Var1 = as.integer(Var1),
+    Percent = Freq / sum(Freq) * 100
+  )
 
   df_values <- dplyr::as_tibble(df_values)
 
   names(df_values) <- c("PxValue", "Qt", "Percent")
 
   list(sumraster, df_values)
-
 }
