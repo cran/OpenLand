@@ -1,6 +1,6 @@
 Package: OpenLand
 Title: Quantitative Analysis and Visualization of LUCC
-Version: 1.0.4
+Version: 1.0.5
 Authors@R: c(
     person(given = "Reginal",
            family = "Exavier",
@@ -38,10 +38,10 @@ VignetteBuilder: knitr
 Language: en-US
 Config/roxygen2/version: 8.0.0
 NeedsCompilation: no
-Packaged: 2026-07-01 03:11:13 UTC; tredgi
+Packaged: 2026-07-10 02:08:38 UTC; tredgi
 Author: Reginal Exavier [aut, cre] (ORCID:
     <https://orcid.org/0000-0002-5237-523X>),
   Peter Zeilhofer [aut]
 Maintainer: Reginal Exavier <reginalexavier@rocketmail.com>
 Repository: CRAN
-Date/Publication: 2026-07-01 23:20:16 UTC
+Date/Publication: 2026-07-10 06:20:08 UTC
